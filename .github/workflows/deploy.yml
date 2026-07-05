@@ -5,10 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Only need to push the built site to the gh-pages branch.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 # Allow only one concurrent deployment.
 concurrency:
@@ -16,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,14 +23,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      # Configures Pages and enables it for the repo if it isn't already, so the
-      # deploy step doesn't 404 on first run.
-      - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - run: npm ci
       # BASE_PATH must match the repo name so asset URLs resolve on Pages.
-      # Firebase config is injected from repository secrets at build time.
+      # Firebase config is injected from repository secrets at build time (safe
+      # to omit — the app just runs in local mode until they're set).
       - run: npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
@@ -42,16 +37,19 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_TEAM_ID: ${{ secrets.VITE_TEAM_ID }}
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      # Publish the built site to the gh-pages branch. GitHub Pages serves it
+      # from there (Settings -> Pages -> Deploy from a branch: gh-pages / root).
+      # .nojekyll keeps Pages from ignoring the hashed asset folders.
+      - name: Publish to gh-pages
+        run: |
+          cd dist
+          touch .nojekyll
+          git init -q
+          git checkout -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
