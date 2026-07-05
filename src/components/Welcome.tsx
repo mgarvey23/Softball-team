@@ -18,13 +18,11 @@ export function Welcome({ team, onPicked }: Props) {
   const [signingUp, setSigningUp] = useState(state.players.length === 0);
 
   function handleSignUp(input: PlayerInput) {
-    let newId = '';
-    team.update((s) => {
-      const { state: next, player } = addPlayer(s, input);
-      newId = player.id;
-      return next;
-    });
-    if (newId) onPicked(newId);
+    // Generate the id up front so it stays stable through the cloud transaction,
+    // letting us mark this new player as "me" reliably.
+    const newId = crypto.randomUUID();
+    team.update((s) => addPlayer(s, input, newId).state);
+    onPicked(newId);
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   POSITIONS,
   POSITION_LABELS,
@@ -46,14 +46,11 @@ export function Lineups({ team, meId }: Props) {
         className="idea-add"
         onSubmit={(e) => {
           e.preventDefault();
-          let id = '';
-          team.update((s) => {
-            const { state: next, lineup } = addLineup(s, newName || 'New lineup', meId);
-            id = lineup.id;
-            return next;
-          });
+          // Fixed id so it survives the cloud transaction and we can open it.
+          const id = crypto.randomUUID();
+          team.update((s) => addLineup(s, newName || 'New lineup', meId, id).state);
           setNewName('');
-          if (id) setOpenId(id);
+          setOpenId(id);
         }}
       >
         <input
@@ -97,6 +94,11 @@ function LineupEditor({
   onBack: () => void;
 }) {
   const { state } = team;
+  // Buffer the name locally and save on blur, so typing doesn't fire a write
+  // (and a re-sync) on every keystroke.
+  const [nameDraft, setNameDraft] = useState(lineup.name);
+  useEffect(() => setNameDraft(lineup.name), [lineup.id]); // resync when switching lineups
+
   const inLineup = new Set(lineup.entries.map((e) => e.playerId));
   const available = state.players
     .filter((p) => !inLineup.has(p.id))
@@ -117,8 +119,13 @@ function LineupEditor({
       <div className="view-head">
         <input
           className="lineup-name-input"
-          value={lineup.name}
-          onChange={(e) => team.update((s) => renameLineup(s, lineup.id, e.target.value))}
+          value={nameDraft}
+          onChange={(e) => setNameDraft(e.target.value)}
+          onBlur={() => {
+            if (nameDraft.trim() && nameDraft !== lineup.name) {
+              team.update((s) => renameLineup(s, lineup.id, nameDraft));
+            }
+          }}
         />
         <button
           className="btn-ghost sm danger"

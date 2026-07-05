@@ -39,13 +39,19 @@ export interface PlayerInput {
   positions?: Position[];
 }
 
-/** Add a player and return both the new state and the created player. */
+/**
+ * Add a player and return both the new state and the created player. Pass `id`
+ * to keep the player's id stable when the op is re-applied inside a Firestore
+ * transaction (so the caller can reliably reference the new player, e.g. to set
+ * "this is me").
+ */
 export function addPlayer(
   state: TeamState,
   input: PlayerInput,
+  id: string = uid(),
 ): { state: TeamState; player: Player } {
   const player: Player = {
-    id: uid(),
+    id,
     name: input.name.trim(),
     jersey: input.jersey?.trim() || undefined,
     email: input.email?.trim() || undefined,
@@ -258,10 +264,11 @@ export function addLineup(
   state: TeamState,
   name: string,
   createdBy: string,
+  id: string = uid(),
 ): { state: TeamState; lineup: Lineup } {
   const now = Date.now();
   const lineup: Lineup = {
-    id: uid(),
+    id,
     name: name.trim() || 'New lineup',
     entries: [],
     createdBy,
