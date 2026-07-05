@@ -19,13 +19,17 @@ import {
   type Firestore,
 } from 'firebase/firestore';
 
+// This team's Firebase project. These values are safe to ship in client code --
+// access is controlled by Firestore security rules and the authorized-domains
+// list, not by keeping the config secret. The VITE_FIREBASE_* env vars override
+// them if set (e.g. to point a fork at a different project).
 const config = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyAvYIIGaIYqsDimve5CzVEqBZ9RloZSPXw',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'rec-softball.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'rec-softball',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'rec-softball.firebasestorage.app',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '794602781884',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:794602781884:web:a18f6c024a62c1dc4464b9',
 };
 
 /** Which shared team document to read/write. */
