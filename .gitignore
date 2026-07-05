@@ -1,0 +1,13 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.tsbuildinfo
+# Emitted by `tsc -b` from tsconfig.node.json (composite project)
+vite.config.js
+vite.config.d.ts
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log

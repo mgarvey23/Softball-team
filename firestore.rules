@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// The whole team shares a single document per team at teams/{teamId}. Players
+// sign in anonymously (no login screen), so require an authenticated request
+// but do not tie writes to a specific user -- everyone on the team collaborates
+// on the same document.
+//
+// This is a sensible starting point for a small private rec team. If you want
+// tighter control later (e.g. only named members can write), we can add a
+// members list and check it here.
+//
+// Paste these rules into Firebase console -> Firestore Database -> Rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /teams/{teamId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
