@@ -118,12 +118,6 @@ function TeamShell({ team, mode }: { team: TeamApi; mode: 'local' | 'cloud' }) {
         {tab === 'lineups' && <Lineups team={team} meId={me.id} />}
       </main>
 
-      <footer className="app-footer">
-        <div className="footer-rays" aria-hidden="true" />
-        <p className="footer-motto">Jesus, I trust in You.</p>
-        <p className="footer-church">St. Faustina Catholic Church · Fulshear, Texas</p>
-      </footer>
-
       {settingsOpen && (
         <SettingsModal team={team} mode={mode} onClose={() => setSettingsOpen(false)} />
       )}
