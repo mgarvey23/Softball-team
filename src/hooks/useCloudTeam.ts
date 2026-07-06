@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { TeamState } from '../types';
-import { defaultState, loadState } from '../storage';
-import { mutateTeam, saveTeam, subscribeTeam } from '../services/firestoreTeam';
+import { defaultState } from '../storage';
+import { mutateTeam, subscribeTeam } from '../services/firestoreTeam';
 
 /**
  * Cloud-synced team state. Subscribes to the shared Firestore document for
@@ -22,11 +22,13 @@ export function useCloudTeam(teamId: string) {
       teamId,
       (remote) => setState(remote),
       () => {
-        // No cloud document yet: seed from any local data, else defaults.
-        const local = loadState();
-        const seed = local.players.length > 0 ? local : defaultState();
-        setState(seed);
-        void saveTeam(teamId, seed);
+        // The team document doesn't exist yet. Show an empty team locally, but
+        // do NOT write a blank team to the server here: if this "missing"
+        // signal were ever wrong it would wipe real data. The document is
+        // instead created lazily by the first real edit, which goes through a
+        // transaction (mutateTeam) that reads the latest server state first and
+        // therefore can never clobber an existing team.
+        setState(defaultState());
       },
     );
     return unsub;

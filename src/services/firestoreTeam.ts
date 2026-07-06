@@ -6,7 +6,6 @@ import {
   doc,
   onSnapshot,
   runTransaction,
-  setDoc,
   type Unsubscribe,
 } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -39,11 +38,6 @@ export function subscribeTeam(
       onMissing();
     }
   });
-}
-
-/** Overwrite the shared team document (used only to seed a brand-new team). */
-export async function saveTeam(teamId: string, state: TeamState): Promise<void> {
-  await setDoc(teamDoc(teamId), state);
 }
 
 /**
