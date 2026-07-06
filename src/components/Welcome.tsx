@@ -63,6 +63,9 @@ export function Welcome({ team, onPicked }: Props) {
             </button>
           </>
         )}
+
+        <p className="welcome-motto">Jesus, I trust in You.</p>
+        <p className="welcome-church">St. Faustina Catholic Church · Fulshear, Texas</p>
       </div>
     </div>
   );
