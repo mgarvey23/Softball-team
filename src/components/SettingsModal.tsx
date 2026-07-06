@@ -1,12 +1,26 @@
-import { useState } from 'react';
-import type { TeamApi } from '../types';
+import { useCallback, useEffect, useState } from 'react';
+import type { TeamApi, TeamState } from '../types';
 import { setTeamName } from '../teamOps';
 import { exportState, importState } from '../storage';
+import { TEAM_ID } from '../firebase';
+import { listBackups, saveBackup, type Backup } from '../services/firestoreTeam';
 
 interface Props {
   team: TeamApi;
   mode: 'local' | 'cloud';
   onClose: () => void;
+}
+
+function backupSummary(s: TeamState): string {
+  const parts = [
+    [s.players.length, 'players'],
+    [s.practices.length, 'events'],
+    [s.topics.length, 'topics'],
+    [s.ideas.length, 'ideas'],
+    [s.lineups.length, 'lineups'],
+  ] as const;
+  const nonZero = parts.filter(([n]) => n > 0).map(([n, label]) => `${n} ${label}`);
+  return nonZero.length ? nonZero.join(' · ') : 'empty';
 }
 
 /** Team settings: rename the team, back up / restore data, and see how the
@@ -15,6 +29,41 @@ export function SettingsModal({ team, mode, onClose }: Props) {
   const [name, setName] = useState(team.state.teamName);
   const [importText, setImportText] = useState('');
   const [msg, setMsg] = useState<string | null>(null);
+  const [backups, setBackups] = useState<Backup[] | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const refreshBackups = useCallback(async () => {
+    try {
+      setBackups(await listBackups(TEAM_ID));
+    } catch {
+      setBackups([]); // e.g. rules not updated yet; fail quietly
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mode === 'cloud') void refreshBackups();
+  }, [mode, refreshBackups]);
+
+  async function backupNow() {
+    setBusy(true);
+    try {
+      await saveBackup(TEAM_ID, team.state);
+      await refreshBackups();
+      setMsg('Backup saved.');
+    } catch {
+      setMsg("Couldn't save backup. Make sure the Firestore rules are updated.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function restore(b: Backup) {
+    const when = new Date(b.createdAt).toLocaleString();
+    if (confirm(`Restore the team to the backup from ${when}?\n\nThis replaces the current data for everyone.`)) {
+      team.update(() => b.state);
+      setMsg(`Restored backup from ${when}.`);
+    }
+  }
 
   function download() {
     const blob = new Blob([exportState(team.state)], { type: 'application/json' });
@@ -76,7 +125,7 @@ export function SettingsModal({ team, mode, onClose }: Props) {
             </button>
           </div>
           <details className="import-box">
-            <summary>Restore from backup</summary>
+            <summary>Restore from a backup file</summary>
             <textarea
               rows={4}
               value={importText}
@@ -88,6 +137,43 @@ export function SettingsModal({ team, mode, onClose }: Props) {
             </button>
           </details>
         </div>
+
+        {mode === 'cloud' && (
+          <div className="settings-section">
+            <div className="backups-head">
+              <h3>Automatic backups</h3>
+              <button className="btn-ghost sm" onClick={backupNow} disabled={busy}>
+                {busy ? 'Saving…' : 'Back up now'}
+              </button>
+            </div>
+            <p className="muted">
+              Snapshots are saved automatically as the team changes. If anything
+              gets wiped, restore one here.
+            </p>
+
+            {backups === null ? (
+              <p className="muted">Loading backups…</p>
+            ) : backups.length === 0 ? (
+              <p className="muted">No backups yet.</p>
+            ) : (
+              <ul className="backup-list">
+                {backups.map((b) => (
+                  <li className="backup-row" key={b.id}>
+                    <div className="backup-info">
+                      <span className="backup-when">
+                        {new Date(b.createdAt).toLocaleString()}
+                      </span>
+                      <span className="backup-summary">{backupSummary(b.state)}</span>
+                    </div>
+                    <button className="btn-ghost sm" onClick={() => restore(b)}>
+                      Restore
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
         {msg && <p className="settings-msg">{msg}</p>}
       </div>
