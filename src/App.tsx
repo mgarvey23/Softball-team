@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isFirebaseConfigured, TEAM_ID } from './firebase';
 import { useAnonAuth } from './hooks/useAnonAuth';
 import { useCloudTeam } from './hooks/useCloudTeam';
@@ -66,6 +66,11 @@ function TeamShell({ team, mode }: { team: TeamApi; mode: 'local' | 'cloud' }) {
     () => team.state.players.find((p) => p.id === meId) ?? null,
     [team.state.players, meId],
   );
+
+  // Reflect the team's chosen name in the browser tab.
+  useEffect(() => {
+    document.title = team.state.teamName || 'Softball Team';
+  }, [team.state.teamName]);
 
   // Not identified yet (first visit, or the chosen player was removed).
   if (!me) {

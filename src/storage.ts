@@ -9,7 +9,7 @@ import type { TeamState } from './types';
 const STORAGE_KEY = 'softball-team:state';
 const CURRENT_VERSION = 1;
 
-export const DEFAULT_TEAM_NAME = 'St. Faustina Softball';
+export const DEFAULT_TEAM_NAME = 'Our Softball Team';
 
 export function defaultState(): TeamState {
   return {
