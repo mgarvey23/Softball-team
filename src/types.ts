@@ -27,6 +27,26 @@ export const POSITION_LABELS: Record<Position, string> = {
   RF: 'Right Field',
 };
 
+/**
+ * Off-field roles: not real fielding spots, but jobs the team needs filled.
+ * GM runs the roster/logistics; Team Chef handles the important stuff (food).
+ */
+export const ROLES = ['GM', 'CHEF'] as const;
+export type Role = (typeof ROLES)[number];
+
+export const ROLE_LABELS: Record<Role, string> = {
+  GM: 'General Manager',
+  CHEF: 'Team Chef',
+};
+
+/** Anything a player can be tagged with: a field position or an off-field role. */
+export type PlayerPosition = Position | Role;
+
+/** True if the given code is an off-field role rather than a field position. */
+export function isRole(code: string): code is Role {
+  return (ROLES as readonly string[]).includes(code);
+}
+
 /** Which hand a player bats/throws with. "S" = switch hitter. */
 export type Hand = 'L' | 'R' | 'S';
 
@@ -40,8 +60,8 @@ export interface Player {
   phone?: string;
   bats?: Hand;
   throws?: 'L' | 'R';
-  /** Positions the player likes / can cover, most-preferred first. */
-  positions: Position[];
+  /** Positions/roles the player can cover, most-preferred first. */
+  positions: PlayerPosition[];
   createdAt: number;
 }
 
@@ -96,8 +116,15 @@ export interface Idea {
   createdAt: number;
 }
 
-/** A batting-order slot: a player and the field position they play. */
-export type FieldAssignment = Position | 'BENCH';
+/** What a lineup slot can be: a field position, an off-field role, or bench. */
+export type FieldAssignment = Position | Role | 'BENCH';
+
+/** Human-readable label for any lineup assignment. */
+export function assignmentLabel(a: FieldAssignment): string {
+  if (a === 'BENCH') return 'Bench';
+  if (isRole(a)) return ROLE_LABELS[a];
+  return POSITION_LABELS[a];
+}
 
 export interface LineupEntry {
   playerId: string;

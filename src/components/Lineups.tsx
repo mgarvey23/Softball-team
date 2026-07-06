@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
+  assignmentLabel,
+  isRole,
   POSITIONS,
-  POSITION_LABELS,
+  ROLES,
   playerName,
   type FieldAssignment,
   type Lineup,
@@ -82,7 +84,15 @@ export function Lineups({ team, meId }: Props) {
   );
 }
 
-const FIELD_OPTIONS: FieldAssignment[] = [...POSITIONS, 'BENCH'];
+const FIELD_OPTIONS: FieldAssignment[] = [...POSITIONS, ...ROLES, 'BENCH'];
+
+/** Short label for the position dropdown (field code, or a friendly role/bench). */
+function optionLabel(a: FieldAssignment): string {
+  if (a === 'BENCH') return 'Bench';
+  if (a === 'GM') return '🧠 GM';
+  if (a === 'CHEF') return '👨‍🍳 Chef';
+  return a;
+}
 
 function LineupEditor({
   team,
@@ -104,10 +114,13 @@ function LineupEditor({
     .filter((p) => !inLineup.has(p.id))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Which field positions are already taken, to flag double-ups.
+  // Which field positions are already taken, to flag double-ups. Off-field
+  // roles (GM, Chef) and the bench aren't fielding spots, so they don't count.
   const taken = new Map<FieldAssignment, number>();
   for (const e of lineup.entries) {
-    if (e.position !== 'BENCH') taken.set(e.position, (taken.get(e.position) ?? 0) + 1);
+    if (e.position !== 'BENCH' && !isRole(e.position)) {
+      taken.set(e.position, (taken.get(e.position) ?? 0) + 1);
+    }
   }
 
   return (
@@ -142,15 +155,16 @@ function LineupEditor({
 
       <ol className="batting-order">
         {lineup.entries.map((entry, i) => {
-          const dup = entry.position !== 'BENCH' && (taken.get(entry.position) ?? 0) > 1;
+          const dup = (taken.get(entry.position) ?? 0) > 1;
+          const roleSlot = isRole(entry.position);
           return (
             <li className="batter" key={entry.playerId}>
               <span className="bat-num">{i + 1}</span>
               <span className="bat-name">{playerName(state, entry.playerId)}</span>
               <select
-                className={`bat-pos ${entry.position === 'BENCH' ? 'benched' : ''} ${dup ? 'dup' : ''}`}
+                className={`bat-pos ${entry.position === 'BENCH' ? 'benched' : ''} ${roleSlot ? 'role' : ''} ${dup ? 'dup' : ''}`}
                 value={entry.position}
-                title={dup ? 'Two players in this position' : POSITION_LABELS[entry.position as keyof typeof POSITION_LABELS] ?? 'Bench'}
+                title={dup ? 'Two players in this position' : assignmentLabel(entry.position)}
                 onChange={(e) =>
                   team.update((s) =>
                     setLineupPosition(s, lineup.id, entry.playerId, e.target.value as FieldAssignment),
@@ -159,7 +173,7 @@ function LineupEditor({
               >
                 {FIELD_OPTIONS.map((pos) => (
                   <option key={pos} value={pos}>
-                    {pos === 'BENCH' ? 'Bench' : pos}
+                    {optionLabel(pos)}
                   </option>
                 ))}
               </select>

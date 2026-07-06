@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { POSITIONS, POSITION_LABELS, type Hand, type Player, type Position } from '../types';
+import {
+  POSITIONS,
+  POSITION_LABELS,
+  ROLES,
+  ROLE_LABELS,
+  type Hand,
+  type Player,
+  type PlayerPosition,
+} from '../types';
 import type { PlayerInput } from '../teamOps';
 
 interface Props {
@@ -17,9 +25,9 @@ export function PlayerForm({ initial, submitLabel, onSubmit, onCancel }: Props) 
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [bats, setBats] = useState<Hand | ''>(initial?.bats ?? '');
   const [throws, setThrows] = useState<'L' | 'R' | ''>(initial?.throws ?? '');
-  const [positions, setPositions] = useState<Position[]>(initial?.positions ?? []);
+  const [positions, setPositions] = useState<PlayerPosition[]>(initial?.positions ?? []);
 
-  function togglePosition(pos: Position) {
+  function togglePosition(pos: PlayerPosition) {
     setPositions((prev) =>
       prev.includes(pos) ? prev.filter((p) => p !== pos) : [...prev, pos],
     );
@@ -118,6 +126,23 @@ export function PlayerForm({ initial, submitLabel, onSubmit, onCancel }: Props) 
               title={POSITION_LABELS[pos]}
             >
               {pos}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="field">
+        <span>Team roles (off the field)</span>
+        <div className="position-picker">
+          {ROLES.map((role) => (
+            <button
+              type="button"
+              key={role}
+              className={`chip chip-role ${positions.includes(role) ? 'chip-on' : ''}`}
+              onClick={() => togglePosition(role)}
+              title={ROLE_LABELS[role]}
+            >
+              {role === 'CHEF' ? '👨‍🍳 Chef' : '🧠 GM'}
             </button>
           ))}
         </div>

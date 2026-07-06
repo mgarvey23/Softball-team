@@ -12,7 +12,7 @@ import type {
   Lineup,
   LineupEntry,
   Player,
-  Position,
+  PlayerPosition,
   TeamState,
   Topic,
 } from './types';
@@ -36,7 +36,7 @@ export interface PlayerInput {
   phone?: string;
   bats?: Player['bats'];
   throws?: Player['throws'];
-  positions?: Position[];
+  positions?: PlayerPosition[];
 }
 
 /**

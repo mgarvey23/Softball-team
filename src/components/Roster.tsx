@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { Player, TeamApi } from '../types';
+import { isRole, type Player, type TeamApi } from '../types';
 import { addPlayer, removePlayer, updatePlayer, type PlayerInput } from '../teamOps';
 import { PlayerForm } from './PlayerForm';
 import { initials } from './Welcome';
@@ -117,8 +117,8 @@ function PlayerCard({
       {player.positions.length > 0 && (
         <div className="pos-tags">
           {player.positions.map((pos) => (
-            <span className="pos-tag" key={pos}>
-              {pos}
+            <span className={`pos-tag ${isRole(pos) ? 'role-tag' : ''}`} key={pos}>
+              {pos === 'GM' ? '🧠 GM' : pos === 'CHEF' ? '👨‍🍳 Chef' : pos}
             </span>
           ))}
         </div>
