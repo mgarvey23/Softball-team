@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import {
+  JERSEY_SIZES,
   POSITIONS,
   POSITION_LABELS,
   ROLES,
   ROLE_LABELS,
   type Hand,
+  type JerseySize,
   type Player,
   type PlayerPosition,
 } from '../types';
@@ -21,7 +23,7 @@ interface Props {
 export function PlayerForm({ initial, submitLabel, onSubmit, onCancel }: Props) {
   const [name, setName] = useState(initial?.name ?? '');
   const [jersey, setJersey] = useState(initial?.jersey ?? '');
-  const [email, setEmail] = useState(initial?.email ?? '');
+  const [jerseySize, setJerseySize] = useState<JerseySize | ''>(initial?.jerseySize ?? '');
   const [phone, setPhone] = useState(initial?.phone ?? '');
   const [bats, setBats] = useState<Hand | ''>(initial?.bats ?? '');
   const [throws, setThrows] = useState<'L' | 'R' | ''>(initial?.throws ?? '');
@@ -39,7 +41,7 @@ export function PlayerForm({ initial, submitLabel, onSubmit, onCancel }: Props) 
     onSubmit({
       name,
       jersey,
-      email,
+      jerseySize: jerseySize || undefined,
       phone,
       bats: bats || undefined,
       throws: throws || undefined,
@@ -73,13 +75,18 @@ export function PlayerForm({ initial, submitLabel, onSubmit, onCancel }: Props) 
 
       <div className="field-row">
         <label className="field grow">
-          <span>Email</span>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="optional"
-          />
+          <span>Jersey size</span>
+          <select
+            value={jerseySize}
+            onChange={(e) => setJerseySize(e.target.value as JerseySize | '')}
+          >
+            <option value="">—</option>
+            {JERSEY_SIZES.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="field grow">
           <span>Phone</span>

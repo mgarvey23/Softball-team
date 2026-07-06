@@ -3,32 +3,35 @@
    ========================================================================== */
 
 :root {
-  --green: #0f6b3c;
-  --green-2: #148a4f;
-  --green-dark: #0a4a29;
-  --green-light: #e7f4ec;
-  --dirt: #c25e34;
-  --gold: #e0a52e;
-  --ink: #14201b;
-  --muted: #64726b;
-  --line: #e6ece7;
-  --bg: #eef2ee;
+  /* Divine Mercy palette: blue + white base, red accent (green removed).
+     The --green* token names are kept for convenience but now hold blues. */
+  --green: #1f5fc4;
+  --green-2: #2f7ce6;
+  --green-dark: #113f8c;
+  --green-light: #e8f1fd;
+  --dirt: #cf4238;
+  --gold: #dca021;
+  --ink: #16233f;
+  --muted: #5d6779;
+  --line: #e2e8f2;
+  --bg: #f2f5fb;
   --card: #ffffff;
-  --yes: #2e8b45;
-  --maybe: #d09211;
-  --no: #cc4436;
-  --violet: #6b4ec7;
+  --yes: #2f6fd0;
+  --maybe: #d0921a;
+  --no: #cf4238;
+  /* Off-field roles now use the Divine Mercy red family. */
+  --violet: #c0392e;
   /* Divine Mercy rays (St. Faustina): a pale ray and a red ray. */
-  --mercy-blue: #9fd0ee;
-  --mercy-red: #d8534e;
+  --mercy-blue: #93c9ee;
+  --mercy-red: #d64a44;
   --radius: 14px;
   --radius-sm: 10px;
   --radius-lg: 20px;
-  --shadow-sm: 0 1px 2px rgba(16, 40, 28, 0.06);
-  --shadow: 0 2px 10px rgba(16, 40, 28, 0.07), 0 1px 3px rgba(16, 40, 28, 0.05);
-  --shadow-lg: 0 14px 34px rgba(16, 40, 28, 0.16);
-  --ring: 0 0 0 3px rgba(15, 107, 60, 0.18);
-  --header-grad: linear-gradient(135deg, #0a4a29 0%, #0f6b3c 55%, #148a4f 100%);
+  --shadow-sm: 0 1px 2px rgba(20, 33, 66, 0.06);
+  --shadow: 0 2px 10px rgba(20, 33, 66, 0.08), 0 1px 3px rgba(20, 33, 66, 0.05);
+  --shadow-lg: 0 14px 34px rgba(20, 33, 66, 0.16);
+  --ring: 0 0 0 3px rgba(31, 95, 196, 0.2);
+  --header-grad: linear-gradient(135deg, #0f3c8a 0%, #1f5fc4 55%, #2f7ce6 100%);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -39,7 +42,7 @@
 body {
   margin: 0;
   background:
-    radial-gradient(1100px 460px at 50% -10%, rgba(20, 138, 79, 0.08), transparent 70%),
+    radial-gradient(1100px 460px at 50% -10%, rgba(47, 124, 230, 0.08), transparent 70%),
     var(--bg);
   background-attachment: fixed;
   color: var(--ink);
@@ -50,7 +53,7 @@ body {
 }
 
 ::selection {
-  background: rgba(15, 107, 60, 0.18);
+  background: rgba(31, 95, 196, 0.18);
 }
 
 button,
@@ -111,11 +114,11 @@ h3 {
   padding: 0.58rem 1rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  box-shadow: 0 2px 8px rgba(15, 107, 60, 0.28);
+  box-shadow: 0 2px 8px rgba(31, 95, 196, 0.28);
 }
 .btn-primary:hover {
   filter: brightness(1.05);
-  box-shadow: 0 4px 14px rgba(15, 107, 60, 0.34);
+  box-shadow: 0 4px 14px rgba(31, 95, 196, 0.34);
 }
 .btn-primary:active {
   transform: translateY(1px);
@@ -139,8 +142,8 @@ h3 {
   font-weight: 600;
 }
 .btn-ghost:hover {
-  border-color: #c9d5cd;
-  background: #f6f9f6;
+  border-color: #c6d3e8;
+  background: #f3f7fd;
 }
 .btn-ghost.sm {
   padding: 0.3rem 0.55rem;
@@ -186,7 +189,7 @@ h3 {
   padding: 0.8rem 1rem;
   background: var(--header-grad);
   color: #fff;
-  box-shadow: 0 2px 14px rgba(10, 74, 41, 0.28);
+  box-shadow: 0 2px 14px rgba(15, 60, 138, 0.28);
 }
 /* Divine Mercy rays: a pale ray and a red ray beneath the header. */
 .app-header::after {
@@ -434,8 +437,8 @@ h3 {
   color: #fff;
 }
 .chip-role.chip-on {
-  background: #5e35b1;
-  border-color: #5e35b1;
+  background: #c0392e;
+  border-color: #c0392e;
 }
 
 /* --- Welcome ------------------------------------------------------------- */
@@ -556,7 +559,7 @@ h3 {
 .player-card.is-me {
   border-color: var(--green);
   box-shadow: 0 0 0 1.5px var(--green), var(--shadow);
-  background: linear-gradient(180deg, #f4fbf6, var(--card) 60%);
+  background: linear-gradient(180deg, #f1f7ff, var(--card) 60%);
 }
 .player-top {
   display: flex;
@@ -589,13 +592,20 @@ h3 {
   font-weight: 700;
 }
 .pos-tag.role-tag {
-  background: #ede7f6;
-  color: #5e35b1;
+  background: #fdeceb;
+  color: #c0392e;
 }
 .player-meta {
   margin: 0.15rem 0;
   font-size: 0.85rem;
   color: var(--muted);
+}
+.player-meta.jersey-size {
+  margin-top: 0.4rem;
+  color: var(--ink);
+}
+.player-meta.jersey-size strong {
+  color: var(--green-dark);
 }
 .card-actions {
   display: flex;
@@ -655,7 +665,7 @@ h3 {
 .avail-btn.avail-yes.active {
   border-color: var(--yes);
   color: var(--yes);
-  background: #eaf5eb;
+  background: #e8f1fd;
 }
 .avail-btn.avail-maybe.active {
   border-color: var(--maybe);
@@ -766,7 +776,7 @@ h3 {
 }
 .post.mine .post-body {
   background: var(--green-light);
-  border-color: #cfe4d6;
+  border-color: #d3e2f7;
 }
 .post-head {
   display: flex;
@@ -935,8 +945,8 @@ h3 {
   font-weight: 500;
 }
 .bat-pos.role {
-  background: #ede7f6;
-  color: #5e35b1;
+  background: #fdeceb;
+  color: #c0392e;
   font-weight: 700;
 }
 .bat-pos.dup {

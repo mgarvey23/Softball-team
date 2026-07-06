@@ -32,7 +32,7 @@ export function setTeamName(state: TeamState, name: string): TeamState {
 export interface PlayerInput {
   name: string;
   jersey?: string;
-  email?: string;
+  jerseySize?: Player['jerseySize'];
   phone?: string;
   bats?: Player['bats'];
   throws?: Player['throws'];
@@ -54,7 +54,7 @@ export function addPlayer(
     id,
     name: input.name.trim(),
     jersey: input.jersey?.trim() || undefined,
-    email: input.email?.trim() || undefined,
+    jerseySize: input.jerseySize,
     phone: input.phone?.trim() || undefined,
     bats: input.bats,
     throws: input.throws,
@@ -77,7 +77,7 @@ export function updatePlayer(
             ...p,
             ...('name' in patch ? { name: (patch.name ?? p.name).trim() } : {}),
             ...('jersey' in patch ? { jersey: patch.jersey?.trim() || undefined } : {}),
-            ...('email' in patch ? { email: patch.email?.trim() || undefined } : {}),
+            ...('jerseySize' in patch ? { jerseySize: patch.jerseySize } : {}),
             ...('phone' in patch ? { phone: patch.phone?.trim() || undefined } : {}),
             ...('bats' in patch ? { bats: patch.bats } : {}),
             ...('throws' in patch ? { throws: patch.throws } : {}),

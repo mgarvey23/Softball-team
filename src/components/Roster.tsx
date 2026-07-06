@@ -124,8 +124,12 @@ function PlayerCard({
         </div>
       )}
 
+      {player.jerseySize && (
+        <p className="player-meta jersey-size">
+          👕 Jersey size: <strong>{player.jerseySize}</strong>
+        </p>
+      )}
       {handed && <p className="player-meta">{handed}</p>}
-      {player.email && <p className="player-meta">{player.email}</p>}
       {player.phone && <p className="player-meta">{player.phone}</p>}
 
       <div className="card-actions">

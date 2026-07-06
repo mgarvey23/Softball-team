@@ -50,13 +50,18 @@ export function isRole(code: string): code is Role {
 /** Which hand a player bats/throws with. "S" = switch hitter. */
 export type Hand = 'L' | 'R' | 'S';
 
+/** Jersey/shirt sizes, for ordering team gear. */
+export const JERSEY_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL'] as const;
+export type JerseySize = (typeof JERSEY_SIZES)[number];
+
 /** A member of the team. Also serves as a lightweight identity: a person picks
  *  their player on first visit and it is remembered on their device. */
 export interface Player {
   id: string;
   name: string;
   jersey?: string;
-  email?: string;
+  /** Jersey/shirt size, for ordering team gear. */
+  jerseySize?: JerseySize;
   phone?: string;
   bats?: Hand;
   throws?: 'L' | 'R';
